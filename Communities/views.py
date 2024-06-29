@@ -46,10 +46,12 @@ class ShowCommunities(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = User.objects.get(email = request.user.email)
-            communities = user.members.all()
-            serializer = CommunitySerializer(communities, many = True)
-            if serializer:
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            member_communities = user.members.all()
+            owner_communities = Community.objects.filter(owner = request.user)
+            member_serializer = CommunitySerializer(member_communities, many = True)
+            owner_serializer = CommunitySerializer(owner_communities, many = True)
+            if member_serializer or owner_serializer:
+                return Response(member_serializer.data + owner_serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(json.dumps({"error": "no data found"}), status = status.HTTP_404_NOT_FOUND)
         else:
