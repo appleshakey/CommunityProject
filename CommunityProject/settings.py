@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'News',
     'Events',
     'UserPosts',
+    'Communities',
+    'PublicPosts',
     'rest_framework',
     'rest_framework.authtoken'
 ]

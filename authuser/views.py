@@ -4,9 +4,11 @@ from rest_framework.views import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import AnonymousUser
 from django.middleware.csrf import get_token
 from .models import User
 import json
+import uuid
 
 # Create your views here.
 
@@ -33,3 +35,6 @@ class UserLogin(APIView):
             return Response(json.dumps({"token": token.key}), status=status.HTTP_200_OK)
         else:
             return Response(json.dumps({"error": "wrong email or password"}), status=status.HTTP_400_BAD_REQUEST)
+        
+    def get(self, request):
+        return Response("verified")
