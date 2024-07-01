@@ -25,7 +25,8 @@ urlpatterns = [
     path('events/', include("Events.urls")),
     path('news/', include("News.urls")),
     path('community/', include("Communities.urls")),
-    path('public_post/', include("PublicPosts.urls"))
+    path('public_posts/', include("PublicPosts.urls")),
+    path('user_posts/', include("UserPosts.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
