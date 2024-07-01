@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import Events
 from .serializer import EventsSerializer
 from Communities.models import Community
+from authuser.models import User
 import json
 # Create your views here.
 
@@ -15,7 +16,6 @@ class EventCreate(APIView):
             description = request.data["description"]
             event_time = request.data["event_time"]
             community = Community.objects.get(name=request.data["community_name"])
-            print(community.id)
             data={
                 "id": "",
                 "title": title,
@@ -29,15 +29,44 @@ class EventCreate(APIView):
                 return Response(json.dumps({"message": "Event successfully created"}), status = status.HTTP_201_CREATED)
             else:
                 return Response(status = status.HTTP_400_BAD_REQUEST)
-            
         else:
             return Response(json.dumps({"message": "user not logged in"}))
         
 class GetAllEvents(APIView):
     def post(self, request):
         if request.user.is_authenticated:
-            community = Community.objects.get(name = request.data["name"])
-            print(community.members)
-            return Response(json.dumps({"OK"}))
+            user = User.objects.get(email=request.user.email)
+            members = user.members.all()
+            owners = Community.objects.filter(owner = user)
+            community = Community.objects.get(name = request.data["community_name"])
+            if community in list(members) or community in list(owners):
+                events = Events.objects.filter(community = community)
+                serializer = EventsSerializer(events, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(json.dumps({"error": "cannot get"}), status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response(json.dumps({"error": "unauthorized"}, status=status.HTTP_401_UNAUTHORIZED))
 
+class GetInduvidualEvent(APIView):
+    def post(self, request):
+        if request.user.is_authenticated:
+            user = User.objects.get(email=request.user.email)
+            members = user.members.all()
+            owners = Community.objects.filter(owner = user)
+            event = Events.objects.get(id = request.data["id"])
+            if event.community in list(members) or event.community in list(owners):
+                serializer = EventsSerializer(event)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(json.dumps({"error": "cannot get"}), status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response(json.dumps({"error": "unauthorized"}), status=status.HTTP_401_UNAUTHORIZED)
+    
+    def get(self, request):
+        user = User.objects.get(email=request.user.email)
+        members = user.members.all()
+        owners = Community.objects.filter(owner = user)
+        print(members, owners)
+        return Response("OK")
         
