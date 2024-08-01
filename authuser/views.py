@@ -17,8 +17,12 @@ class UserCreation(APIView):
         email = request.data['email']
         password = request.data['password']
         name = request.data['name']
-        contact = request.data['contact']
-        user = User.objects.create_user(email=email, password=password, name=name, contact=contact)
+        age = request.data['age']
+        country = request.data['country']
+        state = request.data['state']
+        pincode = request.data['pincode']
+        username = request.data['username']
+        user = User.objects.create_user(email=email, password=password, name=name, age=age, country=country, state=state, pincode=pincode, username=username)
         user = User.objects.get(email=email)
         if user:
             token = Token.objects.create(user=user)

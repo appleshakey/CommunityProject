@@ -26,7 +26,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key = True, editable = False, default = uuid.uuid4)
     email = models.EmailField(blank = True, default = '', unique = True)
     name = models.CharField(max_length = 255, blank = True, default = '')
-    contact = models.PositiveBigIntegerField(blank = True, null = True)
+    age = models.IntegerField(default=0)
+    country = models.CharField(max_length = 300, default = '')
+    state = models.CharField(max_length = 300, default = '')
+    pincode = models.IntegerField(default=0)
+    username = models.CharField(max_length=300, unique=True)
     is_active = models.BooleanField(default = True)
     is_superuser = models.BooleanField(default = False)
     is_staff = models.BooleanField(default = False)
@@ -38,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = 'User'
