@@ -15,6 +15,7 @@ class CreateCommunity(APIView):
             data = {
                 "name": request.data["name"],
                 "description": request.data["description"],
+                "photo": request.data["photo"],
                 "owner": request.user.id,
             }
             key = uuid.uuid4()
@@ -50,8 +51,19 @@ class ShowCommunities(APIView):
             owner_communities = Community.objects.filter(owner = request.user)
             member_serializer = CommunitySerializer(member_communities, many = True)
             owner_serializer = CommunitySerializer(owner_communities, many = True)
+            comms = member_serializer.data + owner_serializer.data
+            
+            #removing duplicates
+            unique_comms = {}
+            response = []
+
+            for i in range(len(comms)):
+                if comms[i]["secret_key"] not in unique_comms.keys():
+                    unique_comms[comms[i]["secret_key"]] = comms[i]
+                    response.append(comms[i])
+
             if member_serializer or owner_serializer:
-                return Response(member_serializer.data + owner_serializer.data, status=status.HTTP_200_OK)
+                return Response(response[::-1], status=status.HTTP_200_OK)
             else:
                 return Response(json.dumps({"error": "no data found"}), status = status.HTTP_404_NOT_FOUND)
         else:
